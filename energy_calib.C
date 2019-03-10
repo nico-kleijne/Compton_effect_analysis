@@ -49,6 +49,10 @@ void Hist_creator(const std::string f_name, TH1F * hist_pt){
 //of the fitted Gaussian and its statistical error in the variables pointed by the last 2 arguments.
 void Peak_finder(TH1F * hist_pt, TF1 * fit_func, int xmin, int xmax, double * peak, double * peak_err){
 	
+	//int binmax = hist_pt->GetMaximumBin(); 
+	//double x = hist_pt->GetXaxis()->GetBinCenter(binmax);
+	//*peak = x;
+	//*peak_err = 8;
 	hist_pt -> Fit(fit_func, "L0", "R", xmin, xmax); //Fit in range with maximum likelihood without drawing
 	*peak = fit_func -> GetParameter(1); //Get the mean of the Gaussian
 	*peak_err =  fit_func -> GetParError(1); //Get the statistical error on the mean of the Gaussian
@@ -60,9 +64,12 @@ int main(){
 	float		high_b= pow(2.0,13.0)+0.5; //Maximum value of the last bin
 	unsigned	bin_size= pow(2.0,0.0); //Size of the bin, change the second number to scale the size
 	
-	string	F_names[5] = {"dati/energy_calib/3L1_calib_source_Co.log", "dati/energy_calib/3L1_calib_source_Co.log", 
-						  "dati/energy_calib/3L4_calib_source_Na.log", "dati/energy_calib/3L5_calib_source_Ce.log",
-						  "dati/energy_calib/3L6_calib_source_Am.log"}; //Files with raw data from different sources
+	//string	F_names[5] = {"dati/energy_calib/3L1_calib_source_Co.log", "dati/energy_calib/3L1_calib_source_Co.log", 
+						  //"dati/energy_calib/3L4_calib_source_Na.log", "dati/energy_calib/3L5_calib_source_Ce.log",
+						  //"dati/energy_calib/3L6_calib_source_Am.log"}; //Files with raw data from different sources
+	string	F_names[5] = {"dati/3M9_cal2_1s_Co_90d.log", "dati/3M9_cal2_1s_Co_90d.log", 
+						  "dati/3M8_cal1_1s_Na_90d.log", "dati/3M10_cal2_1s_Cs_90d.log",
+						  "dati/3M11_cal2_1s_Am_90d.log"}; //Files with raw data from different sources
 	const TString Elements[5] = {"Co1", "Co2", "Na", "Ce", "Am"};					
 	int xmin[5] = {5200, 5900, 2200, 2900, 240}; //Minima of fitting regions
 	int xmax[5] = {5900, 6600, 2700, 3500, 350}; //Maxima of fitting regions
@@ -75,7 +82,7 @@ int main(){
 	double real_e[5] = {1.1732, 1.3325, 0.51100, 0.6617, 0.0595409}; //Known values for the energies of the peaks
 	double real_e_err[5] = {0.};
 	double constant_init[5] = {60, 50, 80, 150, 500}; //Inizializing parameters to make the fit converge
-	double mean_init[5] = {5500, 6200, 2450, 3200, 270};
+	double mean_init[5] = {5500, 6300, 2450, 3200, 270};
 	double sigma_init[5] = {150, 130, 100, 100, 20}; 
 	TH1F * histos[5];	//Array of histograms' pointers to save the data
 	TF1 * fit_func_0[5];
@@ -92,7 +99,7 @@ int main(){
 	for (int i = 0; i < 5; i++){
 		
 		//Create and fill the histograms
-		histos[i] = new TH1F(Elements[i], Elements[i], int ((high_b-low_b-1.0)/bin_size), low_b, high_b);
+		histos[i] = new TH1F(Elements[i], Elements[i], int ((high_b-low_b)/bin_size), low_b, high_b);
 		Hist_creator(F_names[i], histos[i]);
 		
 		//Create and initialize the fitting functions
@@ -146,14 +153,14 @@ int main(){
 		
 		//Create and fit the calibration curve
 		TGraphErrors* gr1 = new TGraphErrors(5, real_e, peaks_1, real_e_err, peaks_err_1);
-		gr1->Fit("pol2","L");
-		TF1 * my_fit_func = gr1 -> GetFunction("pol2");
+		gr1->Fit("pol1","L");
+		TF1 * my_fit_func = gr1 -> GetFunction("pol1");
 		
 		//Get the results
 		par0 = my_fit_func->GetParameter(0);
 		par1 = my_fit_func->GetParameter(1);
-		par2 = my_fit_func->GetParameter(2);
-		cout << "a = " << par2 << " b = " << par1 << " ; c = " << par0 << endl;
+		//par2 = my_fit_func->GetParameter(2);
+		cout << " m = " << par1 << " ; q = " << par0 << endl;
 		
 		//Draw the results
 		c2 -> cd();

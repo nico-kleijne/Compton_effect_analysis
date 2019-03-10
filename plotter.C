@@ -24,13 +24,13 @@ int main(){
 	
 	float		low_b=-0.5;
 	float		high_b= pow(2.0,13.0)+0.5;
-	unsigned	bin_size= pow(2.0,1.0);
+	unsigned	bin_size= pow(2.0,0.0);
 		
 	int	tvalue = 0;
 	
-	TH1F * hist_pt = new TH1F("hist_pt", "hist_pt", int ((high_b-low_b-1.0)/bin_size), low_b, high_b);
+	TH1F * hist_pt = new TH1F("hist_pt", "hist_pt", int ((high_b-low_b)/bin_size), low_b, high_b);
 	std::ifstream myfile;
-	myfile.open("dati/3L7_acquire_2s_Co_Ce_ext_duty_15d.log");
+	myfile.open("dati/3G41_angcal_1s_Co_0d.log");
 	if ( (myfile.rdstate() & std::ifstream::failbit ) != 0 )
 	std::cerr << "Error opening 'test.txt'\n";
 
